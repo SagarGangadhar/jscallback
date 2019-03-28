@@ -1,0 +1,178 @@
+<html>
+<style>
+body {
+  background: #f2f2f2;
+}
+
+.add-user-container {
+  background: #f2f2f2;
+  padding: 20px 20px;
+}
+
+.users-list-container {
+  background: #f2f2f2;
+  padding: 20px 20px;
+}
+
+#usersList {
+  padding-left: 0;
+}
+
+input[type="text"] {
+  width: 50%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border: 1px solid #4D90FE;
+  box-shadow: 0px 0px 5px  #4D90FE;
+}
+
+button {
+  background: #4d90fe;
+  padding: 12px 20px;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.error {
+  padding: 10px 20px 20px 0;
+  color: red;
+  letter-spacing: 2px;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.add-user-container input:required {
+  border-left-color: salmon;
+}
+
+button:hover {
+  background: #4d90fe;
+  color: #fff;
+}
+
+li {
+  background: #e0e0e0;
+  list-style: none;
+  display: flex;
+  padding: 10px 10px;
+}
+
+li div {
+  flex: 0.3;
+}
+
+</style>
+<script>
+// START YOUR CODE HERE
+
+document.getElementById("saveUserDetail").onclick = function saveUserDetail() {
+  const USER_NAME = document.getElementById("userName").value;
+  const EMAIL_ADDRESS = document.getElementById("emailAddress").value;
+  if (USER_NAME == "" || EMAIL_ADDRESS == "") {
+    document.getElementsByClassName("error")[0].innerHTML =
+      "Please Enter Valid Details.";
+  } else if (!isValidEmail(EMAIL_ADDRESS)) {
+    document.getElementsByClassName("error")[0].innerHTML =
+      "Please Enter Valid E-Mail Address.";
+  } else {
+    addUser(USER_NAME, EMAIL_ADDRESS, displayUserList);    
+    document.getElementsByClassName("error")[0].innerHTML = "";
+  }
+}
+
+// Reusable fuction to check validity of an Email. Returns boolean 
+function isValidEmail(email_value) {
+  const REGEX_EMAIL = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  return REGEX_EMAIL.test(email_value);
+}
+
+function validateEmail(email) {
+  if (!isValidEmail(email)) {
+    document.getElementsByClassName("error")[0].innerHTML =
+      "Please Enter Valid E-Mail Address";
+  } else {
+    const CHECK_USER_NAME = document.getElementById("userName").value;
+    const CHECK_EMAIL_ADDRESS = document.getElementById("emailAddress").value;
+    if (CHECK_USER_NAME == "" || CHECK_EMAIL_ADDRESS == "") {
+      document.getElementsByClassName("error")[0].innerHTML =
+        "Enter Valid Details";
+      document.getElementById("saveUserDetail").disabled = false;
+      document.getElementsByClassName("error")[0].innerHTML = "";
+    }
+  }
+}
+
+function displayUserList(response) {
+  const RESPONSE_STATUS = response.success;
+  if (!RESPONSE_STATUS) {
+    const RESPONSE_ERROR = response.error;
+    document.getElementsByClassName("error")[0].innerHTML = RESPONSE_ERROR;
+  } else {
+    const ADDED_USER_NAME = response.user.username;
+    const ADDED_EMAIL_ADDRESS = response.user.email;
+    document.getElementsByClassName("error")[0].innerHTML = "";
+    let user_list = document.getElementById("usersList");
+    let user_list_item = document.createElement("li");    
+    let user_name_container = document.createElement("div");
+    let user_email_container = document.createElement("div");
+    user_name_container.appendChild(document.createTextNode(ADDED_USER_NAME));
+    user_email_container.appendChild(document.createTextNode(ADDED_EMAIL_ADDRESS));
+    user_list_item.innerHTML += user_name_container.outerHTML + 		user_email_container.outerHTML;
+    user_list.appendChild(user_list_item);
+    document.getElementById("userName").value = "";
+    document.getElementById("emailAddress").value = "";
+  }
+}
+// END YOUR CODE HERE
+
+// Do not modify this function. Add user service wrapper.
+function addUser(username, email, callback) {
+  var xhr = new XMLHttpRequest();
+  var response;
+  var success = !!Math.round(Math.random());
+
+  if (!success) {
+    response = JSON.stringify({
+      success: success,
+      error: "Oups, something went wrong!"
+    });
+  } else {
+    response = JSON.stringify({
+      success: success,
+      user: {
+        username: username,
+        email: email
+      }
+    });
+  }
+
+  xhr.open("POST", "/echo/json/");
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      callback(JSON.parse(xhr.responseText));
+    }
+  };
+  xhr.send("json=" + response);
+}
+</script>
+<body>
+  <div class="add-user-container">
+    <h2>Add a User:</h2>
+    <input type="text" name="username" id="userName" placeholder="Name" required/>
+    <input type="text" name="email" id="emailAddress" placeholder="Email" required/>
+    <div class="error"></div>
+    <button id="saveUserDetail">Add User</button>
+  </div>
+  <div class="users-list-container">
+    <h2>Users:</h2>
+    <ul id="usersList"></ul>
+  </div>
+</body>
+</html>
