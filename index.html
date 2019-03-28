@@ -72,7 +72,7 @@ li div {
 <script>
 // START YOUR CODE HERE
 
-document.getElementById("saveUserDetail").onclick = function saveUserDetail() {
+function saveUserDetail() {
   const USER_NAME = document.getElementById("userName").value;
   const EMAIL_ADDRESS = document.getElementById("emailAddress").value;
   if (USER_NAME == "" || EMAIL_ADDRESS == "") {
@@ -168,7 +168,7 @@ function addUser(username, email, callback) {
     <input type="text" name="username" id="userName" placeholder="Name" required/>
     <input type="text" name="email" id="emailAddress" placeholder="Email" required/>
     <div class="error"></div>
-    <button id="saveUserDetail">Add User</button>
+    <button onclick="saveUserDetail()">Add User</button>
   </div>
   <div class="users-list-container">
     <h2>Users:</h2>
